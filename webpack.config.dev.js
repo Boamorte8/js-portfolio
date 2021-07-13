@@ -2,8 +2,6 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
 module.exports = {
@@ -14,7 +12,8 @@ module.exports = {
         assetModuleFilename: 'assets/images/[hash][ext][query]',
         clean: true,
     },
-    mode: 'production',
+    mode: 'development',
+    watch: true,
     resolve: {
         extensions: ['.js'],
         alias: {
@@ -47,10 +46,17 @@ module.exports = {
             },
             {
                 test: /\.(woff|woff2)$/,
-                type: "asset/resource",
-                generator: {
-                    filename: "assets/fonts/[name].[contenthash].[ext]"
-                },
+                use: {
+                    loader: 'url-loader',
+                    options: {
+                        limit: 10000,
+                        mimetype: 'application/font-woff',
+                        name: '[name].[contenthash].[ext]',
+                        outputPath: './assets/fonts',
+                        publicPath: '../assets/fonts',
+                        esModule: false,
+                    }
+                }
             },
         ]
     },
@@ -73,11 +79,4 @@ module.exports = {
         }),
         new Dotenv(),
     ],
-    optimization: {
-        minimize: true,
-        minimizer: [
-            new CssMinimizerPlugin(),
-            new TerserPlugin(),
-        ],
-    },
 }
